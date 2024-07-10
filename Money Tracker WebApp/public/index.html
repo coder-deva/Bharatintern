@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Transfer App</title>
+    <style>
+        body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url('background.jpg'); /* Change 'background.jpg' to the path of your image */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8); /* Adding some transparency to the container */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+h1 {
+    text-align: center;
+    color: #007bff;
+}
+
+.balance {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.balance h2 {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+.transaction-form {
+    margin-bottom: 20px;
+}
+
+.transaction-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.transaction-form select, .transaction-form input[type="number"], .transaction-form button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+
+.transaction-form button {
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+}
+
+.transactions {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.transactions h2 {
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.transactions ul {
+    padding: 0;
+}
+
+.transactions li {
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.income {
+    color: #28a745;
+}
+
+.expense {
+    color: #dc3545;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Money Transfer App</h1>
+        <div class="balance">
+            <h2>Balance: $<span id="balance">0</span></h2>
+        </div>
+        <form id="transaction-form">
+            <label for="type">Type:</label>
+            <select id="type" name="type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+
+
+            <div class="balance">
+                <h2>Income: $<span id="income">0</span></h2>
+                <h2>Expense: $<span id="expense">0</span></h2>
+                <h2>Balance: $<span id="balance">0</span></h2>
+            </div>
+            
+
+
+
+
+
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount">
+            <button type="submit">Add Transaction</button>
+        </form>
+        <div class="transactions">
+            <h2>Transactions</h2>
+            <ul id="transaction-list">
+            </ul>
+        </div>
+    </div>
+    
+        <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const transactionForm = document.getElementById('transaction-form');
+        const transactionList = document.getElementById('transaction-list');
+        const balanceSpan = document.getElementById('balance');
+
+        // Function to fetch and display transactions
+        // Function to fetch and display transactions
+function fetchTransactions() {
+    fetch('/transactions')
+        .then(response => response.json())
+        .then(data => {
+            // Log the response from the server (for debugging purposes)
+            console.log('Transactions:', data);
+
+            // Update balance, income, and expense in HTML
+            document.getElementById('income').textContent = data.income.toFixed(2);
+            document.getElementById('expense').textContent = data.expense.toFixed(2);
+            document.getElementById('balance').textContent = data.balance.toFixed(2);
+        })
+        .catch(error => console.error('Error fetching transactions:', error));
+}
+
+
+        // Fetch transactions when the page loads
+        fetchTransactions();
+
+        // Submit event listener for the transaction form
+        transactionForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const type = transactionForm.type.value;
+            const amount = parseFloat(transactionForm.amount.value);
+
+            // Send a POST request to the server with transaction data
+            fetch('/transactions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ type, amount })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Log the response from the server (for debugging purposes)
+                console.log('Transaction saved:', data);
+
+                // Fetch and display transactions again
+                fetchTransactions();
+            })
+            .catch(error => console.error('Error saving transaction:', error));
+
+            // Reset the form
+            transactionForm.reset();
+        });
+    });
+</script>
+
+</body>
+</html>
